@@ -1,17 +1,3 @@
-PdfSharp
-========
-
-Initial PdfSharp/MigraDoc version 1.32 copy from http://pdfsharp.codeplex.com/SourceControl/changeset/94858
-
-Currently trying to extend the MigraDoc library with some missing barcode features
-
-
-
-==================================================================================
-
-Copy of the original !Readme.txt:
-
-
 Welcome to PDFsharp and MigraDoc Foundation
 ===========================================
 
@@ -78,4 +64,3 @@ If you favor fast PDF generation, stay with version 1.30.
 One of the forthcoming versions will allow you to configure the
 generation of PDF files (something like "Optimize for Size" and
 "Optimize for Speed").
-
