@@ -142,6 +142,9 @@
       <DependentUpon>DocumentPreview.xaml</DependentUpon>
     </Compile>
     <Compile Include="MigraDoc.Rendering.Windows\enums\Zoom.cs" />
+    <Compile Include="MigraDoc.Rendering\BarcodeFormatInfo.cs" />
+    <Compile Include="MigraDoc.Rendering\BarcodeRenderer.cs" />
+    <Compile Include="MigraDoc.Rendering\BarcodeRenderInfo.cs" />
     <Compile Include="MigraDoc.Rendering\ColorHelper.cs" />
     <Compile Include="MigraDoc.Rendering\enums\PageRenderOptions.cs" />
     <Compile Include="VersionInfo.cs" />
