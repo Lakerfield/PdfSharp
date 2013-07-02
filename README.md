@@ -1,15 +1,24 @@
-PdfSharp
-========
+PdfSharp/MigraDoc
+=================
 
-Initial PdfSharp/MigraDoc version 1.32 copy from http://pdfsharp.codeplex.com/SourceControl/changeset/94858
+Adding barcode functionality in MigraDoc in combination with PdfSharp (not for rtf rendering)
 
-Currently trying to extend the MigraDoc library with some missing barcode features
+Changes made:
+
+- Clone PdfSharp/MigraDoc version 1.32 from http://pdfsharp.codeplex.com/SourceControl/changeset/94858
+- Added Vs2012 solution, and test project
+- Applied patch with code38 and interleaved 2 of 5 from http://forum.pdfsharp.net/viewtopic.php?p=3332#p3332
+- Implemented code 128 barcode from http://forum.pdfsharp.net/viewtopic.php?p=3332#p6264
+- Some refactoring in the barcode (text) renderer
+- Extended MigraDoc DocumentObjectModel with AddBarcode methodes
+- ...
+
 
 
 
 ==================================================================================
+Original !Readme.txt from http://pdfsharp.codeplex.com/SourceControl/changeset/94858
 
-Copy of the original !Readme.txt:
 
 
 Welcome to PDFsharp and MigraDoc Foundation
