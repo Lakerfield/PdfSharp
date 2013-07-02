@@ -97,19 +97,29 @@ namespace MigraDoc.Rendering
             XRect destRect = new XRect(contentArea.X, contentArea.Y, formatInfo.Width, formatInfo.Height);
 
             BarCode gfxBarcode = null;
-
-            if (this.barcode.Type == BarcodeType.Barcode39)
-                gfxBarcode = new Code3of9Standard();
-            else if (this.barcode.Type == BarcodeType.Barcode25i)
-                gfxBarcode = new Code2of5Interleaved();
+            switch (this.barcode.Type)
+            {
+                case BarcodeType.Barcode128:
+                    gfxBarcode = new Code128();
+                    break;
+                case BarcodeType.Barcode25i:
+                    gfxBarcode = new Code2of5Interleaved();
+                    break;
+                case BarcodeType.Barcode39:
+                    gfxBarcode = new Code3of9Standard();
+                    break;
+                default:
+                    break;
+            }
 
             // if gfxBarcode is null, the barcode type is not supported
             if (gfxBarcode != null)
             {
+                if (barcode.Text)
+                  gfxBarcode.TextLocation = TextLocation.BelowEmbedded;
                 gfxBarcode.Text = this.barcode.Code;
                 gfxBarcode.Direction = CodeDirection.LeftToRight;
                 gfxBarcode.Size = new XSize(ShapeWidth, ShapeHeight);
-
                 this.gfx.DrawBarCode(gfxBarcode, XBrushes.Black, destRect.Location);
             }
 

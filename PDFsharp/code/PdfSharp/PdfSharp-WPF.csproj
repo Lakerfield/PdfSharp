@@ -86,6 +86,7 @@
     <Compile Include="PdfSharp.Drawing.BarCodes\BarCode.cs" />
     <Compile Include="PdfSharp.Drawing.BarCodes\BarCodeRenderInfo.cs" />
     <Compile Include="PdfSharp.Drawing.BarCodes\BcgSR.cs" />
+    <Compile Include="PdfSharp.Drawing.BarCodes\Code128.cs" />
     <Compile Include="PdfSharp.Drawing.BarCodes\Code2of5Interleaved.cs" />
     <Compile Include="PdfSharp.Drawing.BarCodes\Code3of9Standard.cs" />
     <Compile Include="PdfSharp.Drawing.BarCodes\CodeBase.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="PdfSharp.Drawing.BarCodes\CodeOmr.cs" />
     <Compile Include="PdfSharp.Drawing.BarCodes\DataMatrixImage.cs" />
     <Compile Include="PdfSharp.Drawing.BarCodes\enums\AnchorType.cs" />
+    <Compile Include="PdfSharp.Drawing.BarCodes\enums\Code128Type.cs" />
     <Compile Include="PdfSharp.Drawing.BarCodes\enums\CodeDirection.cs" />
     <Compile Include="PdfSharp.Drawing.BarCodes\enums\CodeType.cs" />
     <Compile Include="PdfSharp.Drawing.BarCodes\enums\DataMatrixEncoding.cs" />

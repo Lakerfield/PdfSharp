@@ -154,6 +154,14 @@ namespace MigraDoc.DocumentObjectModel.Tables
     }
 
     /// <summary>
+    /// Adds a new barcode to the cell.
+    /// </summary>
+    public Barcode AddBarcode()
+    {
+      return this.Elements.AddBarcode();
+    }
+
+    /// <summary>
     /// Adds a new paragraph to the cell.
     /// </summary>
     public void Add(Paragraph paragraph)
@@ -183,6 +191,14 @@ namespace MigraDoc.DocumentObjectModel.Tables
     public void Add(TextFrame textFrame)
     {
       this.Elements.Add(textFrame);
+    }
+
+    /// <summary>
+    /// Adds a new barcode to the cell.
+    /// </summary>
+    public void Add(Barcode barcode)
+    {
+      this.Elements.Add(barcode);
     }
     #endregion
 

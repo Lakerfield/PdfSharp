@@ -425,6 +425,16 @@ namespace MigraDoc.DocumentObjectModel
     }
 
     /// <summary>
+    /// Adds a new barcode.
+    /// </summary>
+    public Barcode AddBarcode()
+    {
+      Barcode barcode = new Barcode();
+      Add(barcode);
+      return barcode;
+    }
+
+    /// <summary>
     /// 
     /// </summary>
     public override void Add(DocumentObject docObj)

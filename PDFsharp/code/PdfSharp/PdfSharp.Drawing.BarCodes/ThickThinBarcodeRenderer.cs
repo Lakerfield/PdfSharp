@@ -102,8 +102,8 @@ namespace PdfSharp.Drawing.BarCodes
     {
       double barWidth = GetBarWidth(info, isThick);
       double height = Size.Height;
-      if (TextLocation != TextLocation.None)
-        height *= 4.0 / 5;
+      //if (TextLocation != TextLocation.None)
+      //  height *= 4.0 / 5;
       XRect rect = new XRect(info.CurrPos.X, info.CurrPos.Y, barWidth, height);
       info.Gfx.DrawRectangle(info.Brush, rect);
       info.CurrPos.X += barWidth;
@@ -138,10 +138,33 @@ namespace PdfSharp.Drawing.BarCodes
     internal void RenderText(BarCodeRenderInfo info)
     {
       if (info.Font == null)
-        info.Font = new XFont("Courier New", Size.Height / 6);
+        info.Font = new XFont("Courier New", this.Size.Height / 6);
       XPoint center = info.Position + CodeBase.CalcDistance(this.anchor, AnchorType.TopLeft, this.size);
-      //center.Y += info.Font.Size;
-      info.Gfx.DrawString(this.text, info.Font, info.Brush, new XRect(center, Size), XStringFormats.BottomCenter);
+      if (this.TextLocation == TextLocation.Above)
+        info.Gfx.DrawString(this.text, info.Font, info.Brush, new XRect(center, this.Size), XStringFormats.TopCenter);
+      else if (this.TextLocation == TextLocation.AboveEmbedded)
+      {
+        XSize textSize = info.Gfx.MeasureString(this.text, info.Font);
+        textSize.Width += this.Size.Width * .15;
+        XPoint point = info.Position;
+        point.X += (this.Size.Width - textSize.Width) / 2;
+        XRect rect = new XRect(point, textSize);
+        info.Gfx.DrawRectangle(XBrushes.White, rect);
+        info.Gfx.DrawString(this.text, info.Font, info.Brush, new XRect(center, this.Size), XStringFormats.TopCenter);
+      }
+      else if (this.TextLocation == TextLocation.Below)
+        info.Gfx.DrawString(this.text, info.Font, info.Brush, new XRect(center, this.Size), XStringFormats.BottomCenter);
+      else if (this.TextLocation == TextLocation.BelowEmbedded)
+      {
+        XSize textSize = info.Gfx.MeasureString(this.text, info.Font);
+        textSize.Width += this.Size.Width * .15;
+        XPoint point = info.Position;
+        point.X += (this.Size.Width - textSize.Width) / 2;
+        point.Y += this.Size.Height - textSize.height;
+        XRect rect = new XRect(point, textSize);
+        info.Gfx.DrawRectangle(XBrushes.White, rect);
+        info.Gfx.DrawString(this.text, info.Font, info.Brush, new XRect(center, this.Size), XStringFormats.BottomCenter);
+      }
     }
 
     /// <summary>

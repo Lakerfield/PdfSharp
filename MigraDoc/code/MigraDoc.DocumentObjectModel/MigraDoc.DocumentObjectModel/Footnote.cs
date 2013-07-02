@@ -121,6 +121,14 @@ namespace MigraDoc.DocumentObjectModel
     }
 
     /// <summary>
+    /// Adds a new barcode to the footnote.
+    /// </summary>
+    public Barcode AddBarcode()
+    {
+      return this.Elements.AddBarcode();
+    }
+
+    /// <summary>
     /// Adds a new image to the footnote.
     /// </summary>
     public Image AddImage(string name)
@@ -150,6 +158,14 @@ namespace MigraDoc.DocumentObjectModel
     public void Add(Image image)
     {
       this.Elements.Add(image);
+    }
+
+    /// <summary>
+    /// Adds a new barcode to the footnote.
+    /// </summary>
+    public void Add(Barcode barcode)
+    {
+      this.Elements.Add(barcode);
     }
     #endregion
 

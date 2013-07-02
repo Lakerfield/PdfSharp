@@ -47,6 +47,11 @@ namespace PdfSharp.Drawing.BarCodes
       return String.Format("'{0}' is not a valid code for a 3 of 9 standard bar code.", code);
     }
 
+    internal static string InvalidCode128(int code)
+    {
+      return String.Format("'{0}' is not a valid code for a code128 bar code.", code);
+    }
+
     internal static string BarCodeNotSet
     {
       get

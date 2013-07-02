@@ -129,6 +129,14 @@ namespace MigraDoc.DocumentObjectModel.Shapes
     }
 
     /// <summary>
+    /// Adds a new barcode to the text frame.
+    /// </summary>
+    public Barcode AddBarcode()
+    {
+      return this.Elements.AddBarcode();
+    }
+
+    /// <summary>
     /// Adds a new paragraph to the text frame.
     /// </summary>
     public void Add(Paragraph paragraph)
@@ -158,6 +166,14 @@ namespace MigraDoc.DocumentObjectModel.Shapes
     public void Add(Image image)
     {
       this.Elements.Add(image);
+    }
+
+    /// <summary>
+    /// Adds a new barcode to the text frame.
+    /// </summary>
+    public void Add(Barcode barcode)
+    {
+      this.Elements.Add(barcode);
     }
     #endregion
 
