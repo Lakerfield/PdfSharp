@@ -108,12 +108,12 @@ namespace PdfSharp
     /// <summary>
     /// The build number of the product. Also used for NuGet Version.
     /// </summary>
-    public const string VersionBuild = "3103";  // Build = days since 2005-01-01  -  change this values ONLY HERE
+    public const string VersionBuild = "3580";  // Build = days since 2005-01-01  -  change this values ONLY HERE
 
     /// <summary>
     /// The patch number of the product. Also used for NuGet Version.
     /// </summary>
-    public const string VersionPatch = "1";
+    public const string VersionPatch = "2";
 
     /// <summary>
     /// E.g. "1/1/2005", for use in NuGet Script.
