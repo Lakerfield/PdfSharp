@@ -70,6 +70,8 @@ namespace MigraDoc.DocumentObjectModel
       return (Styles)base.DeepCopy();
     }
 
+    private Hashtable NameIndex = new Hashtable(StringComparer.CurrentCultureIgnoreCase);
+
     /// <summary>
     /// Gets a style by its name.
     /// </summary>
@@ -77,15 +79,8 @@ namespace MigraDoc.DocumentObjectModel
     {
       get
       {
-        int count = Count;
-        // index starts from 1; DefaultParagraphFont cannot be modified.
-        for (int index = 1; index < count; ++index)
-        {
-          Style style = (Style)this[index];
-          if (String.Compare(style.Name, styleName, true) == 0)
-            return style;
-        }
-        return null;
+        Style res = NameIndex[styleName] as Style;
+        return res == this[0] ? null : res;
       }
     }
 
@@ -174,6 +169,8 @@ namespace MigraDoc.DocumentObjectModel
       }
       else
         base.Add(value);
+
+      NameIndex[style.Name] = style;
     }
     #endregion
 

@@ -65,7 +65,7 @@ namespace MigraDoc.DocumentObjectModel
       if (!Enum.IsDefined(typeof(BorderType), type))
         throw new InvalidEnumArgumentException("type");
 
-      return !(this.IsNull(type.ToString()));
+      return this.GetBorder(type) != null;
     }
 
     #region Methods
@@ -140,6 +140,84 @@ namespace MigraDoc.DocumentObjectModel
     {
       this.clearAll = true;
     }
+
+    /// <summary>
+    /// Return border if specified, fast version of Borders.GetValue(type.ToString(), RV.ReadOnly)
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public Border GetBorder(BorderType type) {
+      // AndrewT: optimization - time-critical routine due to high calls number when render tables
+      switch (type) {
+        case BorderType.Left:
+          return this.left;
+
+        case BorderType.Right:
+          return this.right;
+
+        case BorderType.Top:
+          return this.top;
+
+        case BorderType.Bottom:
+          return this.bottom;
+
+        case BorderType.DiagonalDown:
+          return this.diagonalDown;
+
+        case BorderType.DiagonalUp:
+          return this.diagonalUp;
+
+        default:
+          return this.GetValue(type.ToString(), GV.ReadOnly) as Border;
+      }
+    }
+
+    public BorderStyle GetEffectiveBorderStyle(BorderType type) {
+      Border border = GetBorder(type);
+      if (border != null && !border.style.IsNull)
+        return border.Style;
+      else if (!this.style.IsNull)
+        return this.Style;
+
+      return BorderStyle.Single;
+    }
+
+
+    /// <summary>
+    /// Returns effective width in points
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public double GetEffectiveWidth(BorderType type) {
+      Border border = this.GetBorder(type);
+
+      if (border != null) {
+        if (!border.visible.IsNull && !border.Visible)
+          return 0;
+
+        if (border != null && !border.width.IsNull)
+          return border.Width.Point;
+
+        if (!border.color.IsNull || !border.style.IsNull || border.Visible) {
+          if (!this.width.IsNull)
+            return this.Width.Point;
+
+          return 0.5;
+        }
+      }
+      else if (!(type == BorderType.DiagonalDown || type == BorderType.DiagonalUp)) {
+        if (!this.visible.IsNull && !this.Visible)
+          return 0;
+
+        if (!this.width.IsNull)
+          return this.Width.Point;
+
+        if (!this.color.IsNull || !this.style.IsNull || this.Visible)
+          return 0.5;
+      }
+      return 0;
+    }
+
     #endregion
 
     #region Properties
@@ -312,6 +390,11 @@ namespace MigraDoc.DocumentObjectModel
     }
     [DV]
     internal Color color = Color.Empty;
+
+    public bool HasColor
+    {
+      get { return !this.color.IsNull; }
+    }
 
     /// <summary>
     /// Gets or sets the distance between text and the top border.

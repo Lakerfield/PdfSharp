@@ -26,6 +26,8 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 // DEALINGS IN THE SOFTWARE.
+//
+// Andrew Tsekhansky (mailto:pakeha07@gmail.com): Table rendering optimization in 2010
 #endregion
 
 using System;
@@ -98,11 +100,8 @@ namespace MigraDoc.Rendering
       if (this.lastHeaderRow < 0)
         return;
 
-      foreach (Cell cell in this.mergedCells)
-      {
-        if (cell.Row.Index <= this.lastHeaderRow)
-          RenderCell(cell);
-      }
+      foreach (Cell cell in this.mergedCells.GetCells(0, this.lastHeaderRow))
+        RenderCell(cell); 
     }
 
     void RenderCell(Cell cell)
@@ -223,18 +222,8 @@ namespace MigraDoc.Rendering
       RenderHeaderRows();
       if (startRow < this.table.Rows.Count)
       {
-        Cell cell = this.table[startRow, 0];
-
-        int cellIdx = this.mergedCells.BinarySearch(this.table[startRow, 0], new CellComparer());
-        while (cellIdx < this.mergedCells.Count)
-        {
-          cell = (Cell)this.mergedCells[cellIdx];
-          if (cell.Row.Index > this.endRow)
-            break;
-
+        foreach (Cell cell in mergedCells.GetCells(startRow, endRow))
           RenderCell(cell);
-          ++cellIdx;
-        }
       }
     }
 
@@ -278,8 +267,8 @@ namespace MigraDoc.Rendering
 
     void FormatCells()
     {
-      this.formattedCells = new SortedList(new CellComparer());
-      foreach (Cell cell in this.mergedCells)
+      this.formattedCells = new Hashtable();
+      foreach (Cell cell in this.mergedCells.GetCells())
       {
         FormattedCell formattedCell = new FormattedCell(cell, this.documentRenderer, this.mergedCells.GetEffectiveBorders(cell), this.fieldInfos, 0, 0);
         formattedCell.Format(this.gfx);
@@ -492,7 +481,7 @@ namespace MigraDoc.Rendering
     void CreateConnectedRows()
     {
       this.connectedRowsMap = new SortedList();
-      foreach (Cell cell in this.mergedCells)
+      foreach (Cell cell in this.mergedCells.GetCells())
       {
         if (!this.connectedRowsMap.ContainsKey(cell.Row.Index))
         {
@@ -505,7 +494,7 @@ namespace MigraDoc.Rendering
     void CreateConnectedColumns()
     {
       this.connectedColumnsMap = new SortedList();
-      foreach (Cell cell in this.mergedCells)
+      foreach (Cell cell in this.mergedCells.GetCells())
       {
         if (!this.connectedColumnsMap.ContainsKey(cell.Column.Index))
         {
@@ -534,23 +523,14 @@ namespace MigraDoc.Rendering
       XUnit maxWidth = 0;
       if (this.table.Rows.Count > row)
       {
-        int cellIdx = this.mergedCells.BinarySearch(this.table[row, 0], new CellComparer());
-        Cell rowCell = this.mergedCells[cellIdx];
-        while (cellIdx < this.mergedCells.Count)
-        {
-          rowCell = this.mergedCells[cellIdx];
-          if (rowCell.Row.Index > row)
-            break;
-
-          if (!rowCell.IsNull("Borders"))
-          {
+        foreach (Cell rowCell in this.mergedCells.GetRowCells(row)) {
+          if (rowCell.HasBorders) {
             BordersRenderer bordersRenderer = new BordersRenderer(rowCell.Borders, this.gfx);
             XUnit width = 0;
             width = bordersRenderer.GetWidth(BorderType.Top);
             if (width > maxWidth)
               maxWidth = width;
           }
-          ++cellIdx;
         }
       }
       return maxWidth;
@@ -569,21 +549,19 @@ namespace MigraDoc.Rendering
       XUnit maxBottomBorderPosition = lastPos + minMergedFormattedCell.InnerHeight;
       maxBottomBorderPosition += CalcBottomBorderWidth(minMergedCell);
 
-      foreach (Cell cell in this.mergedCells)
+      foreach (Cell cell in this.mergedCells.GetCells(lastBorderRow, minMergedCell.Row.Index + minMergedCell.MergeDown))
       {
-        if (cell.Row.Index > minMergedCell.Row.Index + minMergedCell.MergeDown)
-          break;
-
         if (cell.Row.Index + cell.MergeDown == minMergedCell.Row.Index + minMergedCell.MergeDown)
         {
-          FormattedCell formattedCell = (FormattedCell)this.formattedCells[cell];
-          XUnit topBorderPos = (XUnit)this.bottomBorderMap[cell.Row.Index];
+          FormattedCell formattedCell = (FormattedCell) this.formattedCells[cell];
+          XUnit topBorderPos = (XUnit) this.bottomBorderMap[cell.Row.Index];
           XUnit bottomBorderPos = topBorderPos + formattedCell.InnerHeight;
           bottomBorderPos += CalcBottomBorderWidth(cell);
           if (bottomBorderPos > maxBottomBorderPosition)
             maxBottomBorderPosition = bottomBorderPos;
         }
       }
+
       this.bottomBorderMap.Add(minMergedCell.Row.Index + minMergedCell.MergeDown + 1, maxBottomBorderPosition);
     }
 
@@ -608,27 +586,24 @@ namespace MigraDoc.Rendering
     /// </summary>
     /// <param name="row">The row to prope.</param>
     /// <returns>The first cell with minimal vertical merge.</returns>
-    Cell GetMinMergedCell(int row)
+    private Cell GetMinMergedCell(int row)
     {
       int minMerge = this.table.Rows.Count;
       Cell minCell = null;
-      foreach (Cell cell in this.mergedCells)
+      foreach (Cell cell in this.mergedCells.GetRowCells(row))
       {
-        if (cell.Row.Index == row)
+        if (cell.MergeDown == 0)
         {
-          if (cell.MergeDown == 0)
-          {
-            minCell = cell;
-            break;
-          }
-          else if (cell.MergeDown < minMerge)
-          {
-            minMerge = cell.MergeDown;
-            minCell = cell;
-          }
+          minCell = cell;
+          break;
         }
         else if (cell.Row.Index > row)
           break;
+        else if (cell.MergeDown < minMerge)
+        {
+          minMerge = cell.MergeDown;
+          minCell = cell;
+        }
       }
       return minCell;
     }
@@ -641,17 +616,7 @@ namespace MigraDoc.Rendering
     /// <returns>The last row that is connected with the given row.</returns>
     int CalcLastConnectedRow(int row)
     {
-      int lastConnectedRow = row;
-      foreach (Cell cell in this.mergedCells)
-      {
-        if (cell.Row.Index <= lastConnectedRow)
-        {
-          int downConnection = Math.Max(cell.Row.KeepWith, cell.MergeDown);
-          if (lastConnectedRow < cell.Row.Index + downConnection)
-            lastConnectedRow = cell.Row.Index + downConnection;
-        }
-      }
-      return lastConnectedRow;
+      return this.mergedCells.CalcLastConnectedRow(row);
     }
 
     /// <summary>
@@ -661,24 +626,14 @@ namespace MigraDoc.Rendering
     /// <returns>The last column that is connected with the given column.</returns>
     int CalcLastConnectedColumn(int column)
     {
-      int lastConnectedColumn = column;
-      foreach (Cell cell in this.mergedCells)
-      {
-        if (cell.Column.Index <= lastConnectedColumn)
-        {
-          int rightConnection = Math.Max(cell.Column.KeepWith, cell.MergeRight);
-          if (lastConnectedColumn < cell.Column.Index + rightConnection)
-            lastConnectedColumn = cell.Column.Index + rightConnection;
-        }
-      }
-      return lastConnectedColumn;
+      return this.mergedCells.CalcLastConnectedColumn(column);
     }
 
 
 
     Table table;
     MergedCellList mergedCells;
-    SortedList formattedCells;
+    Hashtable formattedCells;
     SortedList bottomBorderMap;
     SortedList connectedRowsMap;
     SortedList connectedColumnsMap;

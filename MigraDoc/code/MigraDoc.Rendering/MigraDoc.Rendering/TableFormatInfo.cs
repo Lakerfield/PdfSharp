@@ -86,7 +86,7 @@ namespace MigraDoc.Rendering
     internal int endRow = -1;
 
     internal int lastHeaderRow = -1;
-    internal SortedList formattedCells;
+    internal Hashtable formattedCells;
     internal MergedCellList mergedCells;
     internal SortedList bottomBorderMap;
     internal SortedList connectedRowsMap;

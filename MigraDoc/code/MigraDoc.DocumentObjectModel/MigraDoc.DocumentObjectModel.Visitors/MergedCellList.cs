@@ -28,10 +28,13 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 // DEALINGS IN THE SOFTWARE.
+//
+// Andrew Tsekhansky (mailto:pakeha07@gmail.com): Table rendering optimization in 2010
 #endregion
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using MigraDoc.DocumentObjectModel.IO;
 using MigraDoc.DocumentObjectModel.Tables;
 using MigraDoc.DocumentObjectModel.Visitors;
@@ -42,48 +45,8 @@ namespace MigraDoc.DocumentObjectModel.Visitors
   /// <summary>
   /// Represents a merged list of cells of a table.
   /// </summary>
-  public class MergedCellList : ArrayList
+  public class MergedCellList
   {
-
-    /// <summary>
-    /// Enumerator that can iterate through the MergedCellList.
-    /// </summary>
-    public class Enumerator : IEnumerator
-    {
-      internal Enumerator(MergedCellList list)
-      {
-        this.list = list;
-      }
-
-      #region IEnumerator Members
-
-      public void Reset()
-      {
-        this.index = -1;
-      }
-
-      public Cell Current
-      {
-        get
-        {
-          return (Cell)this.list[this.index];
-        }
-      }
-
-      object IEnumerator.Current
-      {
-        get { return Current; }
-      }
-
-      public bool MoveNext()
-      {
-        return ++index < this.list.Count;
-      }
-      #endregion
-
-      MergedCellList list;
-      int index = -1;
-    }
 
     /// <summary>
     /// Enumeration of neighbor positions of cells in a table.
@@ -104,63 +67,75 @@ namespace MigraDoc.DocumentObjectModel.Visitors
       Init(table);
     }
 
+    private int RowCount;
+    private int ColCount;
+    private Table Table;
+    private CellInfo[,] CellInfos;
+    private Hashtable CellIndex;
+
     /// <summary>
     /// Initializes this instance from a table.
     /// </summary>
     private void Init(Table table)
     {
-      for (int rwIdx = 0; rwIdx < table.Rows.Count; ++rwIdx)
+      Table = table;
+      RowCount = Table.Rows.Count;
+      ColCount = Table.Columns.Count;
+
+      CellIndex = new Hashtable();
+      CellInfos = new CellInfo[RowCount, ColCount];
+      for (int rwIdx = 0; rwIdx < RowCount; rwIdx++)
       {
-        for (int clmIdx = 0; clmIdx < table.Columns.Count; ++clmIdx)
+        for (int clmIdx = 0; clmIdx < ColCount; clmIdx++)
         {
           Cell cell = table[rwIdx, clmIdx];
-          if (!IsAlreadyCovered(cell))
-            this.Add(cell);
+          if (CellInfos[rwIdx, clmIdx] == null)
+          {
+            for (int mx = 0; mx <= cell.MergeRight; mx++)
+              for (int my = 0; my <= cell.MergeDown; my++)
+              {
+                bool isMergedCell = mx > 0 || my > 0;
+                CellInfo cellInfo = new CellInfo();
+                cellInfo.TableCell = table[rwIdx + my, clmIdx + mx];
+                cellInfo.Cell = cell;
+                cellInfo.IsMergedCell = isMergedCell;
+                cellInfo.MergedWith = isMergedCell ? CellInfos[rwIdx, clmIdx] : null;
+                cellInfo.Row = rwIdx;
+                cellInfo.Col = clmIdx;
+
+                CellInfos[rwIdx + my, clmIdx + mx] = cellInfo;
+                CellIndex[cellInfo.TableCell] = CellInfos[rwIdx, clmIdx];
+              }
+          }
         }
       }
     }
 
-    /// <summary>
-    /// Returns whether the given cell is already covered by a preceding cell in this instance.
-    /// </summary>
-    /// <remarks>
-    /// Help function for Init().
-    /// </remarks>
-    private bool IsAlreadyCovered(Cell cell)
+    public IEnumerable<Cell> GetCells()
     {
-      for (int index = this.Count - 1; index >= 0; --index)
-      {
+      return GetCells(0, this.RowCount - 1);
+    }
 
-        Cell currentCell = this[index];
-        if (currentCell.Column.Index <= cell.Column.Index && currentCell.Column.Index + currentCell.MergeRight >= cell.Column.Index)
+    public IEnumerable<Cell> GetRowCells(int row)
+    {
+      return GetCells(row, row);
+    }
+
+    public IEnumerable<Cell> GetCells(int startRow, int endRow)
+    {
+      for (int rowIndex = startRow; rowIndex <= endRow; rowIndex++)
+        for (int colIndex = 0; colIndex < ColCount; colIndex++)
         {
-          if (currentCell.Row.Index <= cell.Row.Index && currentCell.Row.Index + currentCell.MergeDown >= cell.Row.Index)
-            return true;
-          else if (currentCell.Row.Index + currentCell.MergeDown == cell.Row.Index - 1)
-            return false;
-
+          CellInfo cellInfo = CellInfos[rowIndex, colIndex];
+          if (!cellInfo.IsMergedCell)
+            yield return cellInfo.Cell;
+          colIndex += cellInfo.Cell.MergeRight;
         }
-      }
-      return false;
     }
 
-    /// <summary>
-    /// Gets the Enumerator for this list.
-    /// </summary>
-    public override IEnumerator GetEnumerator()
+    private static Borders GetCellBorders(Cell cell)
     {
-      return new Enumerator(this);
-    }
-
-    /// <summary>
-    /// Gets the cell at the specified position.
-    /// </summary>
-    public new Cell this[int index]
-    {
-      get
-      {
-        return base[index] as Cell;
-      }
+      return cell.HasBorders ? cell.Borders : null;
     }
 
     /// <summary>
@@ -172,68 +147,77 @@ namespace MigraDoc.DocumentObjectModel.Visitors
     /// </exception>
     public Borders GetEffectiveBorders(Cell cell)
     {
-      Borders borders = cell.GetValue("Borders", GV.ReadOnly) as Borders;
-      if (borders != null)
-      {
-        Document doc = borders.Document;
-        borders = borders.Clone();
-        borders.parent = cell;
-        doc = borders.Document;
-      }
-      else
-        borders = new Borders(cell.parent);
-
-      int cellIdx = this.BinarySearch(cell, new CellComparer());
-      if (!(cellIdx >= 0 && cellIdx < this.Count))
+      CellInfo cellInfo = this.CellIndex[cell] as CellInfo;
+      if (cellInfo == null)
         throw new ArgumentException("cell is not a relevant cell", "cell");
 
-      if (cell.mergeRight > 0)
+      if (cellInfo.Borders == null)
       {
-        Cell rightBorderCell = cell.Table[cell.Row.Index, cell.Column.Index + cell.mergeRight];
-        if (rightBorderCell.borders != null && rightBorderCell.borders.right != null)
-          borders.Right = rightBorderCell.borders.right.Clone();
+        Borders borders = GetCellBorders(cell);
+        if (borders != null)
+        {
+          Document doc = borders.Document;
+          borders = borders.Clone();
+          borders.parent = cell;
+          doc = borders.Document;
+        }
         else
-          borders.right = null;
-      }
+          borders = new Borders(cell.parent);
 
-      if (cell.mergeDown > 0)
-      {
-        Cell bottomBorderCell = cell.Table[cell.Row.Index + cell.mergeDown, cell.Column.Index];
-        if (bottomBorderCell.borders != null && bottomBorderCell.borders.bottom != null)
-          borders.Bottom = bottomBorderCell.borders.bottom.Clone();
-        else
-          borders.bottom = null;
-      }
+        if (cell.mergeRight > 0)
+        {
+          Cell rightBorderCell = cell.Table[cell.Row.Index, cell.Column.Index + cell.mergeRight];
+          if (rightBorderCell.borders != null && rightBorderCell.borders.right != null)
+            borders.Right = rightBorderCell.borders.right.Clone();
+          else
+            borders.right = null;
+        }
 
-      Cell leftNeighbor = GetNeighbor(cellIdx, NeighborPosition.Left);
-      Cell rightNeighbor = GetNeighbor(cellIdx, NeighborPosition.Right);
-      Cell topNeighbor = GetNeighbor(cellIdx, NeighborPosition.Top);
-      Cell bottomNeighbor = GetNeighbor(cellIdx, NeighborPosition.Bottom);
-      if (leftNeighbor != null)
-      {
-        Borders nbrBrdrs = leftNeighbor.GetValue("Borders", GV.ReadWrite) as Borders;
-        if (nbrBrdrs != null && GetEffectiveBorderWidth(nbrBrdrs, BorderType.Right) >= GetEffectiveBorderWidth(borders, BorderType.Left))
-          borders.SetValue("Left", GetBorderFromBorders(nbrBrdrs, BorderType.Right));
+        if (cell.mergeDown > 0)
+        {
+          Cell bottomBorderCell = cell.Table[cell.Row.Index + cell.mergeDown, cell.Column.Index];
+          if (bottomBorderCell.borders != null && bottomBorderCell.borders.bottom != null)
+            borders.Bottom = bottomBorderCell.borders.bottom.Clone();
+          else
+            borders.bottom = null;
+        }
+
+        Cell leftNeighbor = GetNeighbor(cellInfo, NeighborPosition.Left);
+        Cell rightNeighbor = GetNeighbor(cellInfo, NeighborPosition.Right);
+        Cell topNeighbor = GetNeighbor(cellInfo, NeighborPosition.Top);
+        Cell bottomNeighbor = GetNeighbor(cellInfo, NeighborPosition.Bottom);
+        if (leftNeighbor != null)
+        {
+          Borders nbrBrdrs = GetCellBorders(leftNeighbor);
+          if (nbrBrdrs != null &&
+              GetEffectiveBorderWidth(nbrBrdrs, BorderType.Right) >= GetEffectiveBorderWidth(borders, BorderType.Left))
+            borders.SetValue("Left", GetBorderFromBorders(nbrBrdrs, BorderType.Right));
+        }
+        if (rightNeighbor != null)
+        {
+          Borders nbrBrdrs = GetCellBorders(rightNeighbor);
+          if (nbrBrdrs != null &&
+              GetEffectiveBorderWidth(nbrBrdrs, BorderType.Left) > GetEffectiveBorderWidth(borders, BorderType.Right))
+            borders.SetValue("Right", GetBorderFromBorders(nbrBrdrs, BorderType.Left));
+        }
+        if (topNeighbor != null)
+        {
+          Borders nbrBrdrs = GetCellBorders(topNeighbor);
+          if (nbrBrdrs != null &&
+              GetEffectiveBorderWidth(nbrBrdrs, BorderType.Bottom) >= GetEffectiveBorderWidth(borders, BorderType.Top))
+            borders.SetValue("Top", GetBorderFromBorders(nbrBrdrs, BorderType.Bottom));
+        }
+        if (bottomNeighbor != null)
+        {
+          Borders nbrBrdrs = GetCellBorders(bottomNeighbor);
+          if (nbrBrdrs != null &&
+              GetEffectiveBorderWidth(nbrBrdrs, BorderType.Top) > GetEffectiveBorderWidth(borders, BorderType.Bottom))
+            borders.SetValue("Bottom", GetBorderFromBorders(nbrBrdrs, BorderType.Top));
+        }
+
+        cellInfo.Borders = borders;
       }
-      if (rightNeighbor != null)
-      {
-        Borders nbrBrdrs = rightNeighbor.GetValue("Borders", GV.ReadWrite) as Borders;
-        if (nbrBrdrs != null && GetEffectiveBorderWidth(nbrBrdrs, BorderType.Left) > GetEffectiveBorderWidth(borders, BorderType.Right))
-          borders.SetValue("Right", GetBorderFromBorders(nbrBrdrs, BorderType.Left));
-      }
-      if (topNeighbor != null)
-      {
-        Borders nbrBrdrs = topNeighbor.GetValue("Borders", GV.ReadWrite) as Borders;
-        if (nbrBrdrs != null && GetEffectiveBorderWidth(nbrBrdrs, BorderType.Bottom) >= GetEffectiveBorderWidth(borders, BorderType.Top))
-          borders.SetValue("Top", GetBorderFromBorders(nbrBrdrs, BorderType.Bottom));
-      }
-      if (bottomNeighbor != null)
-      {
-        Borders nbrBrdrs = bottomNeighbor.GetValue("Borders", GV.ReadWrite) as Borders;
-        if (nbrBrdrs != null && GetEffectiveBorderWidth(nbrBrdrs, BorderType.Top) > GetEffectiveBorderWidth(borders, BorderType.Bottom))
-          borders.SetValue("Bottom", GetBorderFromBorders(nbrBrdrs, BorderType.Top));
-      }
-      return borders;
+      return cellInfo.Borders;
     }
 
     /// <summary>
@@ -241,21 +225,7 @@ namespace MigraDoc.DocumentObjectModel.Visitors
     /// </summary>
     public Cell GetCoveringCell(Cell cell)
     {
-      int cellIdx = this.BinarySearch(cell, new CellComparer());
-      if (cellIdx >= 0 && cellIdx < this.Count)
-        return this[cellIdx];
-      else //Binary Search returns the complement of the next value, therefore, "~cellIdx - 1" is the previous cell.
-        cellIdx = ~cellIdx - 1;
-      for (int index = cellIdx; index >= 0; --index)
-      {
-        Cell currCell = this[index];
-        if (currCell.Column.Index <= cell.Column.Index &&
-          currCell.Column.Index + currCell.MergeRight >= cell.Column.Index &&
-          currCell.Row.Index <= cell.Row.Index &&
-          currCell.Row.Index + currCell.MergeDown >= cell.Row.Index)
-          return currCell;
-      }
-      return null;
+      return ((CellInfo) CellIndex[cell]).Cell;
     }
 
     /// <summary>
@@ -284,117 +254,117 @@ namespace MigraDoc.DocumentObjectModel.Visitors
       if (borders == null)
         return 0;
 
-      Border border = borders.GetValue(type.ToString(), GV.GetNull) as Border;
-
-      DocumentObject relevantDocObj = border;
-      if (relevantDocObj == null || relevantDocObj.IsNull("Width"))
-        relevantDocObj = borders;
-
-      object visible = relevantDocObj.GetValue("visible", GV.GetNull);
-      object style = relevantDocObj.GetValue("style", GV.GetNull);
-      object width = relevantDocObj.GetValue("width", GV.GetNull);
-      object color = relevantDocObj.GetValue("color", GV.GetNull);
-
-      if (visible != null || style != null || width != null || color != null)
-      {
-        if (visible != null && !(bool)visible)
-          return 0;
-        if (width != null)
-          return (Unit)width;
-
-        return 0.5;
-      }
-      return 0;
+      return borders.GetEffectiveWidth(type);
     }
 
     /// <summary>
     /// Gets the specified cell's uppermost neighbor at the specified position.
     /// </summary>
-    private Cell GetNeighbor(int cellIdx, NeighborPosition position)
+    private Cell GetNeighbor(CellInfo cellInfo, NeighborPosition position)
     {
-      Cell cell = this[cellIdx];
-      if (cell.Column.Index == 0 && position == NeighborPosition.Left ||
-        cell.Row.Index == 0 && position == NeighborPosition.Top ||
-        cell.Row.Index + cell.MergeDown == cell.Table.Rows.Count - 1 && position == NeighborPosition.Bottom ||
-        cell.Column.Index + cell.MergeRight == cell.Table.Columns.Count - 1 && position == NeighborPosition.Right)
-        return null;
+      Cell cell = cellInfo.Cell;
 
       switch (position)
       {
-        case NeighborPosition.Top:
         case NeighborPosition.Left:
-          for (int index = cellIdx - 1; index >= 0; --index)
-          {
-            Cell currCell = this[index];
-            if (IsNeighbor(cell, currCell, position))
-              return currCell;
-          }
+          if (cellInfo.BlockCol > 0)
+            return CellInfos[cellInfo.BlockRow, cellInfo.BlockCol - 1].Cell;
           break;
 
         case NeighborPosition.Right:
-          if (cellIdx + 1 < this.Count)
-          {
-            Cell cell2 = this[cellIdx + 1];
-            if (cell2.Row.Index == cell.Row.Index)
-              return cell2;
-          }
-          for (int index = cellIdx - 1; index >= 0; --index)
-          {
-            Cell currCell = this[index];
-            if (IsNeighbor(cell, currCell, position))
-              return currCell;
-          }
+          if (cellInfo.BlockCol + cell.MergeRight < ColCount - 1)
+            return CellInfos[cellInfo.BlockRow, cellInfo.BlockCol + cell.MergeRight + 1].Cell;
+          break;
+
+        case NeighborPosition.Top:
+          if (cellInfo.BlockRow > 0)
+            return CellInfos[cellInfo.BlockRow - 1, cellInfo.BlockCol].Cell;
           break;
 
         case NeighborPosition.Bottom:
-          for (int index = cellIdx + 1; index < this.Count; ++index)
-          {
-            Cell currCell = this[index];
-            if (IsNeighbor(cell, currCell, position))
-              return currCell;
-          }
+          if (cellInfo.BlockRow + cell.MergeDown < RowCount - 1)
+            return CellInfos[cellInfo.BlockRow + cell.MergeDown + 1, cellInfo.BlockCol].Cell;
           break;
       }
+
       return null;
     }
 
-    /// <summary>
-    /// Returns whether cell2 is a neighbor of cell1 at the specified position.
-    /// </summary>
-    private bool IsNeighbor(Cell cell1, Cell cell2, NeighborPosition position)
+    public int CalcLastConnectedRow(int row)
     {
-      bool isNeighbor = false;
-      switch (position)
+      int lastConnectedRow = row;
+      for (int rowIndex = row; rowIndex <= lastConnectedRow && rowIndex < this.RowCount; rowIndex++)
       {
-        case NeighborPosition.Bottom:
-          int bottomRowIdx = cell1.Row.Index + cell1.MergeDown + 1;
-          isNeighbor = cell2.Row.Index == bottomRowIdx &&
-            cell2.Column.Index <= cell1.Column.Index &&
-            cell2.Column.Index + cell2.MergeRight >= cell1.Column.Index;
-          break;
-
-        case NeighborPosition.Left:
-          int leftClmIdx = cell1.Column.Index - 1;
-          isNeighbor = cell2.Row.Index <= cell1.Row.Index &&
-            cell2.Row.Index + cell2.MergeDown >= cell1.Row.Index &&
-            cell2.Column.Index + cell2.MergeRight == leftClmIdx;
-          break;
-
-        case NeighborPosition.Right:
-          int rightClmIdx = cell1.Column.Index + cell1.MergeRight + 1;
-          isNeighbor = cell2.Row.Index <= cell1.Row.Index &&
-            cell2.Row.Index + cell2.MergeDown >= cell1.Row.Index &&
-            cell2.Column.Index == rightClmIdx;
-          break;
-
-        case NeighborPosition.Top:
-          int topRowIdx = cell1.Row.Index - 1;
-          isNeighbor = cell2.Row.Index + cell2.MergeDown == topRowIdx &&
-            cell2.Column.Index + cell2.MergeRight >= cell1.Column.Index &&
-            cell2.Column.Index <= cell1.Column.Index;
-          break;
+        int downConnection = rowIndex;
+        for (int colIndex = 0; colIndex < this.ColCount; colIndex++)
+        {
+          CellInfo cellInfo = CellInfos[rowIndex, colIndex];
+          downConnection = Math.Max(downConnection,
+            cellInfo.BlockRow + Math.Max(cellInfo.Cell.Row.KeepWith, cellInfo.Cell.MergeDown));
+          colIndex += cellInfo.Cell.MergeRight;
+        }
+        lastConnectedRow = Math.Max(lastConnectedRow, downConnection);
       }
-      return isNeighbor;
+
+      return Math.Min(this.RowCount - 1, lastConnectedRow);
+    }
+
+    public int CalcLastConnectedColumn(int column)
+    {
+      int lastConnectedColumn = column;
+
+      for (int colIndex = column; colIndex <= lastConnectedColumn && colIndex < this.ColCount; colIndex++)
+      {
+        int rightConnection = column;
+        for (int rowIndex = 0; rowIndex < this.RowCount; rowIndex++)
+        {
+          CellInfo cellInfo = CellInfos[rowIndex, colIndex];
+          cellInfo = cellInfo.MergedWith ?? cellInfo;
+          rightConnection = Math.Max(rightConnection,
+            cellInfo.BlockCol + Math.Max(cellInfo.Cell.Column.KeepWith, cellInfo.Cell.MergeRight));
+          rowIndex += cellInfo.Cell.MergeDown;
+        }
+        lastConnectedColumn = Math.Max(lastConnectedColumn, rightConnection);
+      }
+      return Math.Min(lastConnectedColumn, this.ColCount);
     }
   }
+
+  internal class CellInfo
+  {
+
+    // Cell from table at given Row, Col
+    public Cell TableCell;
+
+    // Cell which fills given Row, Col
+    public Cell Cell;
+
+    // Whether cell is merged with another cell
+    public bool IsMergedCell;
+
+    // CellInfo this cell is merged with
+    public CellInfo MergedWith;
+
+    // Cell's Row 
+    public int Row;
+
+    // Cells' Col
+    public int Col;
+
+    // Row where merged area starts
+    public int BlockRow
+    {
+      get { return MergedWith == null ? Row : MergedWith.Row; }
+    }
+
+    // Col where merged area starts
+    public int BlockCol
+    {
+      get { return MergedWith == null ? Col : MergedWith.Col; }
+    }
+
+    public Borders Borders;
+  }
 }
+
+

@@ -49,16 +49,11 @@ namespace MigraDoc.Rendering
       this.borders = borders;
     }
 
-    private Border GetBorder(BorderType type)
-    {
-      return (Border)this.borders.GetValue(type.ToString(), GV.ReadOnly);
-    }
-
     private XColor GetColor(BorderType type)
     {
       Color clr = Colors.Black;
 
-      Border border = GetBorder(type);
+      Border border = borders.GetBorder(type);
       if (border != null && !border.Color.IsEmpty)
         clr = border.Color;
       else if (!this.borders.Color.IsEmpty)
@@ -80,15 +75,7 @@ namespace MigraDoc.Rendering
 
     private BorderStyle GetStyle(BorderType type)
     {
-      BorderStyle style = BorderStyle.Single;
-
-      Border border = GetBorder(type);
-      if (border != null && !border.IsNull("Style"))
-        style = border.Style;
-      else if (!this.borders.IsNull("Style"))
-        style = this.borders.Style;
-
-      return style;
+      return borders.GetEffectiveBorderStyle(type);
     }
 
     internal XUnit GetWidth(BorderType type)
@@ -96,36 +83,7 @@ namespace MigraDoc.Rendering
       if (this.borders == null)
         return 0;
 
-      Border border = GetBorder(type);
-
-      if (border != null)
-      {
-        if (!border.IsNull("Visible") && !border.Visible)
-          return 0;
-
-        if (border != null && !border.IsNull("Width"))
-          return border.Width.Point;
-
-        if (!border.IsNull("Color") || !border.IsNull("Style") || border.Visible)
-        {
-          if (!this.borders.IsNull("Width"))
-            return this.borders.Width.Point;
-
-          return 0.5;
-        }
-      }
-      else if (!(type == BorderType.DiagonalDown || type == BorderType.DiagonalUp))
-      {
-        if (!this.borders.IsNull("Visible") && !this.borders.Visible)
-          return 0;
-
-        if (!this.borders.IsNull("Width"))
-          return this.borders.Width.Point;
-
-        if (!this.borders.IsNull("Color") || !this.borders.IsNull("Style") || this.borders.Visible)
-          return 0.5;
-      }
-      return 0;
+      return borders.GetEffectiveWidth(type);
     }
 
     /// <summary>
