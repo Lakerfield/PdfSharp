@@ -11,6 +11,7 @@ Changes made:
 - Implemented code 128 barcode from http://forum.pdfsharp.net/viewtopic.php?p=3332#p6264
 - Some refactoring in the barcode (text) renderer
 - Extended MigraDoc DocumentObjectModel with AddBarcode methodes
+- Applied patch for faster table rendering from http://www.pakeha_by.my-webs.org/MigraDocFastTableRender.html and http://forum.pdfsharp.net/viewtopic.php?f=2&t=679 (pakeha_by)
 - ...
 
 
