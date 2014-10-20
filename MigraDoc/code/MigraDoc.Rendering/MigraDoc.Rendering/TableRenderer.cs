@@ -549,7 +549,7 @@ namespace MigraDoc.Rendering
       XUnit maxBottomBorderPosition = lastPos + minMergedFormattedCell.InnerHeight;
       maxBottomBorderPosition += CalcBottomBorderWidth(minMergedCell);
 
-      foreach (Cell cell in this.mergedCells.GetCells(lastBorderRow, minMergedCell.Row.Index + minMergedCell.MergeDown))
+      foreach (Cell cell in this.mergedCells.GetCells(Math.Max(0, this.mergedCells.GetFirstRowMergedWithRow(lastBorderRow)), minMergedCell.Row.Index + minMergedCell.MergeDown))
       {
         if (cell.Row.Index + cell.MergeDown == minMergedCell.Row.Index + minMergedCell.MergeDown)
         {

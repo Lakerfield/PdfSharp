@@ -328,6 +328,23 @@ namespace MigraDoc.DocumentObjectModel.Visitors
       }
       return Math.Min(lastConnectedColumn, this.ColCount);
     }
+
+    public int GetFirstRowMergedWithRow(int row)
+    {
+      if (row == 0 || row >= this.RowCount)
+        return row;
+
+      var result = row;
+
+      for (int colIndex = 0; colIndex < ColCount; colIndex++)
+      {
+        CellInfo cellInfo = CellInfos[row, colIndex];
+        result = Math.Min(result, cellInfo.BlockRow);
+        colIndex += cellInfo.Cell.MergeRight;
+      }
+
+      return result;
+    }
   }
 
   internal class CellInfo
