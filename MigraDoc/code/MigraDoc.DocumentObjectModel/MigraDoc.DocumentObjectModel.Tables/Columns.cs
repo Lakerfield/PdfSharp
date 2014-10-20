@@ -180,6 +180,16 @@ namespace MigraDoc.DocumentObjectModel.Tables
       }
     }
     static Meta meta;
+
+    /// <summary>
+    /// Set row.Index for each row in collection
+    /// </summary>
+    internal void PopulateItemIndexes() 
+    {
+      for (int index = 0; index < this.Count; index++)
+        this[index].index = index;
+    }
+
     #endregion
   }
 }
