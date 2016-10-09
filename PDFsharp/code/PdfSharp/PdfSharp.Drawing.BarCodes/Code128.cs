@@ -42,7 +42,117 @@
         /// <summary>
         /// A static place holder for the patterns to draw the code 128 barcode
         /// </summary>
-        public static Dictionary<Byte, Byte[]> Patterns;
+        public static readonly Dictionary<Byte, Byte[]> Patterns = new Dictionary<Byte, Byte[]>
+        {
+            { 0, new Byte[] { 2, 1, 2, 2, 2, 2 } },
+            { 1, new Byte[] { 2, 2, 2, 1, 2, 2 } },
+            { 2, new Byte[] { 2, 2, 2, 2, 2, 1 } },
+            { 3, new Byte[] { 1, 2, 1, 2, 2, 3 } },
+            { 4, new Byte[] { 1, 2, 1, 3, 2, 2 } },
+            { 5, new Byte[] { 1, 3, 1, 2, 2, 2 } },
+            { 6, new Byte[] { 1, 2, 2, 2, 1, 3 } },
+            { 7, new Byte[] { 1, 2, 2, 3, 1, 2 } },
+            { 8, new Byte[] { 1, 3, 2, 2, 1, 2 } },
+            { 9, new Byte[] { 2, 2, 1, 2, 1, 3 } },
+            { 10, new Byte[] { 2, 2, 1, 3, 1, 2 } },
+            { 11, new Byte[] { 2, 3, 1, 2, 1, 2 } },
+            { 12, new Byte[] { 1, 1, 2, 2, 3, 2 } },
+            { 13, new Byte[] { 1, 2, 2, 1, 3, 2 } },
+            { 14, new Byte[] { 1, 2, 2, 2, 3, 1 } },
+            { 15, new Byte[] { 1, 1, 3, 2, 2, 2 } },
+            { 16, new Byte[] { 1, 2, 3, 1, 2, 2 } },
+            { 17, new Byte[] { 1, 2, 3, 2, 2, 1 } },
+            { 18, new Byte[] { 2, 2, 3, 2, 1, 1 } },
+            { 19, new Byte[] { 2, 2, 1, 1, 3, 2 } },
+            { 20, new Byte[] { 2, 2, 1, 2, 3, 1 } },
+            { 21, new Byte[] { 2, 1, 3, 2, 1, 2 } },
+            { 22, new Byte[] { 2, 2, 3, 1, 1, 2 } },
+            { 23, new Byte[] { 3, 1, 2, 1, 3, 1 } },
+            { 24, new Byte[] { 3, 1, 1, 2, 2, 2 } },
+            { 25, new Byte[] { 3, 2, 1, 1, 2, 2 } },
+            { 26, new Byte[] { 3, 2, 1, 2, 2, 1 } },
+            { 27, new Byte[] { 3, 1, 2, 2, 1, 2 } },
+            { 28, new Byte[] { 3, 2, 2, 1, 1, 2 } },
+            { 29, new Byte[] { 3, 2, 2, 2, 1, 1 } },
+            { 30, new Byte[] { 2, 1, 2, 1, 2, 3 } },
+            { 31, new Byte[] { 2, 1, 2, 3, 2, 1 } },
+            { 32, new Byte[] { 2, 3, 2, 1, 2, 1 } },
+            { 33, new Byte[] { 1, 1, 1, 3, 2, 3 } },
+            { 34, new Byte[] { 1, 3, 1, 1, 2, 3 } },
+            { 35, new Byte[] { 1, 3, 1, 3, 2, 1 } },
+            { 36, new Byte[] { 1, 1, 2, 3, 1, 3 } },
+            { 37, new Byte[] { 1, 3, 2, 1, 1, 3 } },
+            { 38, new Byte[] { 1, 3, 2, 3, 1, 1 } },
+            { 39, new Byte[] { 2, 1, 1, 3, 1, 3 } },
+            { 40, new Byte[] { 2, 3, 1, 1, 1, 3 } },
+            { 41, new Byte[] { 2, 3, 1, 3, 1, 1 } },
+            { 42, new Byte[] { 1, 1, 2, 1, 3, 3 } },
+            { 43, new Byte[] { 1, 1, 2, 3, 3, 1 } },
+            { 44, new Byte[] { 1, 3, 2, 1, 3, 1 } },
+            { 45, new Byte[] { 1, 1, 3, 1, 2, 3 } },
+            { 46, new Byte[] { 1, 1, 3, 3, 2, 1 } },
+            { 47, new Byte[] { 1, 3, 3, 1, 2, 1 } },
+            { 48, new Byte[] { 3, 1, 3, 1, 2, 1 } },
+            { 49, new Byte[] { 2, 1, 1, 3, 3, 1 } },
+            { 50, new Byte[] { 2, 3, 1, 1, 3, 1 } },
+            { 51, new Byte[] { 2, 1, 3, 1, 1, 3 } },
+            { 52, new Byte[] { 2, 1, 3, 3, 1, 1 } },
+            { 53, new Byte[] { 2, 1, 3, 1, 3, 1 } },
+            { 54, new Byte[] { 3, 1, 1, 1, 2, 3 } },
+            { 55, new Byte[] { 3, 1, 1, 3, 2, 1 } },
+            { 56, new Byte[] { 3, 3, 1, 1, 2, 1 } },
+            { 57, new Byte[] { 3, 1, 2, 1, 1, 3 } },
+            { 58, new Byte[] { 3, 1, 2, 3, 1, 1 } },
+            { 59, new Byte[] { 3, 3, 2, 1, 1, 1 } },
+            { 60, new Byte[] { 3, 1, 4, 1, 1, 1 } },
+            { 61, new Byte[] { 2, 2, 1, 4, 1, 1 } },
+            { 62, new Byte[] { 4, 3, 1, 1, 1, 1 } },
+            { 63, new Byte[] { 1, 1, 1, 2, 2, 4 } },
+            { 64, new Byte[] { 1, 1, 1, 4, 2, 2 } },
+            { 65, new Byte[] { 1, 2, 1, 1, 2, 4 } },
+            { 66, new Byte[] { 1, 2, 1, 4, 2, 1 } },
+            { 67, new Byte[] { 1, 4, 1, 1, 2, 2 } },
+            { 68, new Byte[] { 1, 4, 1, 2, 2, 1 } },
+            { 69, new Byte[] { 1, 1, 2, 2, 1, 4 } },
+            { 70, new Byte[] { 1, 1, 2, 4, 1, 2 } },
+            { 71, new Byte[] { 1, 2, 2, 1, 1, 4 } },
+            { 72, new Byte[] { 1, 2, 2, 4, 1, 1 } },
+            { 73, new Byte[] { 1, 4, 2, 1, 1, 2 } },
+            { 74, new Byte[] { 1, 4, 2, 2, 1, 1 } },
+            { 75, new Byte[] { 2, 4, 1, 2, 1, 1 } },
+            { 76, new Byte[] { 2, 2, 1, 1, 1, 4 } },
+            { 77, new Byte[] { 4, 1, 3, 1, 1, 1 } },
+            { 78, new Byte[] { 2, 4, 1, 1, 1, 2 } },
+            { 79, new Byte[] { 1, 3, 4, 1, 1, 1 } },
+            { 80, new Byte[] { 1, 1, 1, 2, 4, 2 } },
+            { 81, new Byte[] { 1, 2, 1, 1, 4, 2 } },
+            { 82, new Byte[] { 1, 2, 1, 2, 4, 1 } },
+            { 83, new Byte[] { 1, 1, 4, 2, 1, 2 } },
+            { 84, new Byte[] { 1, 2, 4, 1, 1, 2 } },
+            { 85, new Byte[] { 1, 2, 4, 2, 1, 1 } },
+            { 86, new Byte[] { 4, 1, 1, 2, 1, 2 } },
+            { 87, new Byte[] { 4, 2, 1, 1, 1, 2 } },
+            { 88, new Byte[] { 4, 2, 1, 2, 1, 1 } },
+            { 89, new Byte[] { 2, 1, 2, 1, 4, 1 } },
+            { 90, new Byte[] { 2, 1, 4, 1, 2, 1 } },
+            { 91, new Byte[] { 4, 1, 2, 1, 2, 1 } },
+            { 92, new Byte[] { 1, 1, 1, 1, 4, 3 } },
+            { 93, new Byte[] { 1, 1, 1, 3, 4, 1 } },
+            { 94, new Byte[] { 1, 3, 1, 1, 4, 1 } },
+            { 95, new Byte[] { 1, 1, 4, 1, 1, 3 } },
+            { 96, new Byte[] { 1, 1, 4, 3, 1, 1 } },
+            { 97, new Byte[] { 4, 1, 1, 1, 1, 3 } },
+            { 98, new Byte[] { 4, 1, 1, 3, 1, 1 } },
+            { 99, new Byte[] { 1, 1, 3, 1, 4, 1 } },
+            { 100, new Byte[] { 1, 1, 4, 1, 3, 1 } },
+            { 101, new Byte[] { 3, 1, 1, 1, 4, 1 } },
+            { 102, new Byte[] { 4, 1, 1, 1, 3, 1 } },
+            { 103, new Byte[] { 2, 1, 1, 4, 1, 2 } },
+            { 104, new Byte[] { 2, 1, 1, 2, 1, 4 } },
+            { 105, new Byte[] { 2, 1, 1, 2, 3, 2 } },
+            { 106, new Byte[] { 2, 3, 3, 1, 1, 1, 2 } }
+        };
+
         #endregion
         #endregion
         #region Methods
@@ -318,117 +428,6 @@
         public Code128()
             : base("", XSize.Empty, CodeDirection.LeftToRight)
         {
-            if (Patterns == null)
-            {
-                Patterns = new Dictionary<Byte, Byte[]>();
-                Patterns.Add(0, new Byte[] { 2, 1, 2, 2, 2, 2 });
-                Patterns.Add(1, new Byte[] { 2, 2, 2, 1, 2, 2 });
-                Patterns.Add(2, new Byte[] { 2, 2, 2, 2, 2, 1 });
-                Patterns.Add(3, new Byte[] { 1, 2, 1, 2, 2, 3 });
-                Patterns.Add(4, new Byte[] { 1, 2, 1, 3, 2, 2 });
-                Patterns.Add(5, new Byte[] { 1, 3, 1, 2, 2, 2 });
-                Patterns.Add(6, new Byte[] { 1, 2, 2, 2, 1, 3 });
-                Patterns.Add(7, new Byte[] { 1, 2, 2, 3, 1, 2 });
-                Patterns.Add(8, new Byte[] { 1, 3, 2, 2, 1, 2 });
-                Patterns.Add(9, new Byte[] { 2, 2, 1, 2, 1, 3 });
-                Patterns.Add(10, new Byte[] { 2, 2, 1, 3, 1, 2 });
-                Patterns.Add(11, new Byte[] { 2, 3, 1, 2, 1, 2 });
-                Patterns.Add(12, new Byte[] { 1, 1, 2, 2, 3, 2 });
-                Patterns.Add(13, new Byte[] { 1, 2, 2, 1, 3, 2 });
-                Patterns.Add(14, new Byte[] { 1, 2, 2, 2, 3, 1 });
-                Patterns.Add(15, new Byte[] { 1, 1, 3, 2, 2, 2 });
-                Patterns.Add(16, new Byte[] { 1, 2, 3, 1, 2, 2 });
-                Patterns.Add(17, new Byte[] { 1, 2, 3, 2, 2, 1 });
-                Patterns.Add(18, new Byte[] { 2, 2, 3, 2, 1, 1 });
-                Patterns.Add(19, new Byte[] { 2, 2, 1, 1, 3, 2 });
-                Patterns.Add(20, new Byte[] { 2, 2, 1, 2, 3, 1 });
-                Patterns.Add(21, new Byte[] { 2, 1, 3, 2, 1, 2 });
-                Patterns.Add(22, new Byte[] { 2, 2, 3, 1, 1, 2 });
-                Patterns.Add(23, new Byte[] { 3, 1, 2, 1, 3, 1 });
-                Patterns.Add(24, new Byte[] { 3, 1, 1, 2, 2, 2 });
-                Patterns.Add(25, new Byte[] { 3, 2, 1, 1, 2, 2 });
-                Patterns.Add(26, new Byte[] { 3, 2, 1, 2, 2, 1 });
-                Patterns.Add(27, new Byte[] { 3, 1, 2, 2, 1, 2 });
-                Patterns.Add(28, new Byte[] { 3, 2, 2, 1, 1, 2 });
-                Patterns.Add(29, new Byte[] { 3, 2, 2, 2, 1, 1 });
-                Patterns.Add(30, new Byte[] { 2, 1, 2, 1, 2, 3 });
-                Patterns.Add(31, new Byte[] { 2, 1, 2, 3, 2, 1 });
-                Patterns.Add(32, new Byte[] { 2, 3, 2, 1, 2, 1 });
-                Patterns.Add(33, new Byte[] { 1, 1, 1, 3, 2, 3 });
-                Patterns.Add(34, new Byte[] { 1, 3, 1, 1, 2, 3 });
-                Patterns.Add(35, new Byte[] { 1, 3, 1, 3, 2, 1 });
-                Patterns.Add(36, new Byte[] { 1, 1, 2, 3, 1, 3 });
-                Patterns.Add(37, new Byte[] { 1, 3, 2, 1, 1, 3 });
-                Patterns.Add(38, new Byte[] { 1, 3, 2, 3, 1, 1 });
-                Patterns.Add(39, new Byte[] { 2, 1, 1, 3, 1, 3 });
-                Patterns.Add(40, new Byte[] { 2, 3, 1, 1, 1, 3 });
-                Patterns.Add(41, new Byte[] { 2, 3, 1, 3, 1, 1 });
-                Patterns.Add(42, new Byte[] { 1, 1, 2, 1, 3, 3 });
-                Patterns.Add(43, new Byte[] { 1, 1, 2, 3, 3, 1 });
-                Patterns.Add(44, new Byte[] { 1, 3, 2, 1, 3, 1 });
-                Patterns.Add(45, new Byte[] { 1, 1, 3, 1, 2, 3 });
-                Patterns.Add(46, new Byte[] { 1, 1, 3, 3, 2, 1 });
-                Patterns.Add(47, new Byte[] { 1, 3, 3, 1, 2, 1 });
-                Patterns.Add(48, new Byte[] { 3, 1, 3, 1, 2, 1 });
-                Patterns.Add(49, new Byte[] { 2, 1, 1, 3, 3, 1 });
-                Patterns.Add(50, new Byte[] { 2, 3, 1, 1, 3, 1 });
-                Patterns.Add(51, new Byte[] { 2, 1, 3, 1, 1, 3 });
-                Patterns.Add(52, new Byte[] { 2, 1, 3, 3, 1, 1 });
-                Patterns.Add(53, new Byte[] { 2, 1, 3, 1, 3, 1 });
-                Patterns.Add(54, new Byte[] { 3, 1, 1, 1, 2, 3 });
-                Patterns.Add(55, new Byte[] { 3, 1, 1, 3, 2, 1 });
-                Patterns.Add(56, new Byte[] { 3, 3, 1, 1, 2, 1 });
-                Patterns.Add(57, new Byte[] { 3, 1, 2, 1, 1, 3 });
-                Patterns.Add(58, new Byte[] { 3, 1, 2, 3, 1, 1 });
-                Patterns.Add(59, new Byte[] { 3, 3, 2, 1, 1, 1 });
-                Patterns.Add(60, new Byte[] { 3, 1, 4, 1, 1, 1 });
-                Patterns.Add(61, new Byte[] { 2, 2, 1, 4, 1, 1 });
-                Patterns.Add(62, new Byte[] { 4, 3, 1, 1, 1, 1 });
-                Patterns.Add(63, new Byte[] { 1, 1, 1, 2, 2, 4 });
-                Patterns.Add(64, new Byte[] { 1, 1, 1, 4, 2, 2 });
-                Patterns.Add(65, new Byte[] { 1, 2, 1, 1, 2, 4 });
-                Patterns.Add(66, new Byte[] { 1, 2, 1, 4, 2, 1 });
-                Patterns.Add(67, new Byte[] { 1, 4, 1, 1, 2, 2 });
-                Patterns.Add(68, new Byte[] { 1, 4, 1, 2, 2, 1 });
-                Patterns.Add(69, new Byte[] { 1, 1, 2, 2, 1, 4 });
-                Patterns.Add(70, new Byte[] { 1, 1, 2, 4, 1, 2 });
-                Patterns.Add(71, new Byte[] { 1, 2, 2, 1, 1, 4 });
-                Patterns.Add(72, new Byte[] { 1, 2, 2, 4, 1, 1 });
-                Patterns.Add(73, new Byte[] { 1, 4, 2, 1, 1, 2 });
-                Patterns.Add(74, new Byte[] { 1, 4, 2, 2, 1, 1 });
-                Patterns.Add(75, new Byte[] { 2, 4, 1, 2, 1, 1 });
-                Patterns.Add(76, new Byte[] { 2, 2, 1, 1, 1, 4 });
-                Patterns.Add(77, new Byte[] { 4, 1, 3, 1, 1, 1 });
-                Patterns.Add(78, new Byte[] { 2, 4, 1, 1, 1, 2 });
-                Patterns.Add(79, new Byte[] { 1, 3, 4, 1, 1, 1 });
-                Patterns.Add(80, new Byte[] { 1, 1, 1, 2, 4, 2 });
-                Patterns.Add(81, new Byte[] { 1, 2, 1, 1, 4, 2 });
-                Patterns.Add(82, new Byte[] { 1, 2, 1, 2, 4, 1 });
-                Patterns.Add(83, new Byte[] { 1, 1, 4, 2, 1, 2 });
-                Patterns.Add(84, new Byte[] { 1, 2, 4, 1, 1, 2 });
-                Patterns.Add(85, new Byte[] { 1, 2, 4, 2, 1, 1 });
-                Patterns.Add(86, new Byte[] { 4, 1, 1, 2, 1, 2 });
-                Patterns.Add(87, new Byte[] { 4, 2, 1, 1, 1, 2 });
-                Patterns.Add(88, new Byte[] { 4, 2, 1, 2, 1, 1 });
-                Patterns.Add(89, new Byte[] { 2, 1, 2, 1, 4, 1 });
-                Patterns.Add(90, new Byte[] { 2, 1, 4, 1, 2, 1 });
-                Patterns.Add(91, new Byte[] { 4, 1, 2, 1, 2, 1 });
-                Patterns.Add(92, new Byte[] { 1, 1, 1, 1, 4, 3 });
-                Patterns.Add(93, new Byte[] { 1, 1, 1, 3, 4, 1 });
-                Patterns.Add(94, new Byte[] { 1, 3, 1, 1, 4, 1 });
-                Patterns.Add(95, new Byte[] { 1, 1, 4, 1, 1, 3 });
-                Patterns.Add(96, new Byte[] { 1, 1, 4, 3, 1, 1 });
-                Patterns.Add(97, new Byte[] { 4, 1, 1, 1, 1, 3 });
-                Patterns.Add(98, new Byte[] { 4, 1, 1, 3, 1, 1 });
-                Patterns.Add(99, new Byte[] { 1, 1, 3, 1, 4, 1 });
-                Patterns.Add(100, new Byte[] { 1, 1, 4, 1, 3, 1 });
-                Patterns.Add(101, new Byte[] { 3, 1, 1, 1, 4, 1 });
-                Patterns.Add(102, new Byte[] { 4, 1, 1, 1, 3, 1 });
-                Patterns.Add(103, new Byte[] { 2, 1, 1, 4, 1, 2 });
-                Patterns.Add(104, new Byte[] { 2, 1, 1, 2, 1, 4 });
-                Patterns.Add(105, new Byte[] { 2, 1, 1, 2, 3, 2 });
-                Patterns.Add(106, new Byte[] { 2, 3, 3, 1, 1, 1, 2 });
-            }
             this.code128Code = Code128Type.B;
         }
         /// <summary>
