@@ -12,6 +12,7 @@ Changes made:
 - Some refactoring in the barcode (text) renderer
 - Extended MigraDoc DocumentObjectModel with AddBarcode methodes
 - Applied patch for faster table rendering from http://www.pakeha_by.my-webs.org/MigraDocFastTableRender.html and http://forum.pdfsharp.net/viewtopic.php?f=2&t=679 (pakeha_by)
+- Add ean13 barcode from http://forum.pdfsharp.de/viewtopic.php?f=2&t=1524
 - ...
 
 
