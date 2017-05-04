@@ -50,6 +50,10 @@ namespace MigraDoc.DocumentObjectModel.Shapes
     /// <summary>
     /// Barcode "Code 128"
     /// </summary>
-    Barcode128
+    Barcode128,
+    /// <summary>
+    /// Barcode "EAN 13"
+    /// </summary>
+    BarcodeEan13,
   }
 }

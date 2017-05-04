@@ -93,6 +93,7 @@
     <Compile Include="PdfSharp.Drawing.BarCodes\CodeDataMatrix.cs" />
     <Compile Include="PdfSharp.Drawing.BarCodes\CodeOmr.cs" />
     <Compile Include="PdfSharp.Drawing.BarCodes\DataMatrixImage.cs" />
+    <Compile Include="PdfSharp.Drawing.BarCodes\Ean13.cs" />
     <Compile Include="PdfSharp.Drawing.BarCodes\enums\AnchorType.cs" />
     <Compile Include="PdfSharp.Drawing.BarCodes\enums\Code128Type.cs" />
     <Compile Include="PdfSharp.Drawing.BarCodes\enums\CodeDirection.cs" />

@@ -66,6 +66,9 @@ namespace PdfSharp.Drawing.BarCodes
         case CodeType.Code3of9Standard:
           return new Code3of9Standard(text, size, direction);
 
+        case CodeType.Ean13:
+          return new Ean13(text, size, direction);
+
         default:
 #if !SILVERLIGHT
           throw new InvalidEnumArgumentException("type", (int)type, typeof(CodeType));

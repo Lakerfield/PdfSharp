@@ -108,6 +108,9 @@ namespace MigraDoc.Rendering
                 case BarcodeType.Barcode39:
                     gfxBarcode = new Code3of9Standard();
                     break;
+                case BarcodeType.BarcodeEan13:
+                    gfxBarcode = new Ean13();
+                break;
                 default:
                     break;
             }

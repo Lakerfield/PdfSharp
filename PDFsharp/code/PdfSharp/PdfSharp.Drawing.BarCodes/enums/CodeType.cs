@@ -53,5 +53,10 @@ namespace PdfSharp.Drawing.BarCodes
     /// The data matrix code.
     /// </summary>
     DataMatrix,
+
+    /// <summary>
+    /// The standard ean13 barcode.
+    /// </summary>
+    Ean13,
   }
 }
