@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>Lakerfield.PdfSharp</id>
-        <version>1.32.3</version>
+        <version>1.32.4</version>
         <authors>Michael Lakerveld</authors>
         <projectUrl>https://github.com/Lakerfield/PdfSharp</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>

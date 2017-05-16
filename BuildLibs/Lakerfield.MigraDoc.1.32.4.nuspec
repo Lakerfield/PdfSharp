@@ -2,13 +2,13 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>Lakerfield.MigraDoc</id>
-        <version>1.32.3</version>
+        <version>1.32.4</version>
         <authors>Michael Lakerveld</authors>
         <projectUrl>https://github.com/Lakerfield/PdfSharp</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Special MigraDoc build from Lakerfield</description>
         <dependencies>
-            <dependency id="Lakerfield.PdfSharp" version="1.32.3" />
+            <dependency id="Lakerfield.PdfSharp" version="1.32.4" />
         </dependencies>
     </metadata>
     <files>
