@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>Lakerfield.MigraDoc</id>
+        <version>1.32.3</version>
+        <authors>Michael Lakerveld</authors>
+        <projectUrl>https://github.com/Lakerfield/PdfSharp</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Special MigraDoc build from Lakerfield</description>
+        <dependencies>
+            <dependency id="Lakerfield.PdfSharp" version="1.32.3" />
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="MigraDoc.DocumentObjectModel-WPF.dll" target="lib\net452\MigraDoc.DocumentObjectModel-WPF.dll" />
+        <file src="MigraDoc.Rendering-WPF.dll" target="lib\net452\MigraDoc.Rendering-WPF.dll" />
+        <file src="MigraDoc.RtfRendering-WPF.dll" target="lib\net452\MigraDoc.RtfRendering-WPF.dll" />
+    </files>
+</package>

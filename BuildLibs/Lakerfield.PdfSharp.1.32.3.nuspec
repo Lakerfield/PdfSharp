@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>Lakerfield.PdfSharp</id>
+        <version>1.32.3</version>
+        <authors>Michael Lakerveld</authors>
+        <projectUrl>https://github.com/Lakerfield/PdfSharp</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Special PdfSharp build from Lakerfield</description>
+    </metadata>
+    <files>
+        <file src="PdfSharp-WPF.dll" target="lib\net452\PdfSharp-WPF.dll" />
+        <file src="PdfSharp.Charting-WPF.dll" target="lib\net452\PdfSharp.Charting-WPF.dll" />
+    </files>
+</package>
